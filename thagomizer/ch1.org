@@ -1,0 +1,21 @@
+* 1.1
+1. { 3n + 2 | n ∈ N } = 2, 5, 8, 11, ...
+
+Top Down:
+n ∈ 2 or 
+n - 3 ∈ S
+
+Bottom Up:
+n ∈ 2, and
+if n ∈ S, then n + 3 ∈ S
+
+Rules of inference:
+             n ∈ S 
+------    ----------
+2 ∈ S      n + 3 ∈ S 
+
+
+
+2. 
+3. 
+4. 
