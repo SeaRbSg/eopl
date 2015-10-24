@@ -1,7 +1,6 @@
 #lang eopl
 (require racket)
 (require rackunit)
-(require racket/trace)
 
 ; 1.1
 
@@ -120,9 +119,9 @@
       [(zero? n) (car lat)]
       [(nth-ele (cdr lat) (- n 1))])))
 
-(test-equal? "." (nth-ele '(a b c) 0) 'a)
-(test-equal? "." (nth-ele '(a b c) 1) 'b)
-(test-equal? "." (nth-ele '(a b c) 2) 'c)
+(test-equal? "" (nth-ele '(a b c) 0) 'a)
+(test-equal? "" (nth-ele '(a b c) 1) 'b)
+(test-equal? "" (nth-ele '(a b c) 2) 'c)
 (check-exn exn:fail? (lambda () (nth-ele '(a b c) 3)))
 
 ; 1.6
@@ -161,9 +160,9 @@
       [(eq? s (car los)) (cdr los)]
       [else (cons (car los) (remove-first s (cdr los)))])))
 
-(test-equal? "." (remove-first 'd '(a b c))   '(a b c))
-(test-equal? "." (remove-first 'a '(a b c))   '(b c))
-(test-equal? "." (remove-first 'b '(a b c b)) '(a c b))
+(test-equal? "" (remove-first 'd '(a b c))   '(a b c))
+(test-equal? "" (remove-first 'a '(a b c))   '(b c))
+(test-equal? "" (remove-first 'b '(a b c b)) '(a c b))
 
 ; 1.8 what happens with
 
@@ -175,7 +174,7 @@
       [(remove-first-wacked s (cdr los))])))
 
 ; gives the cdr of the list after the first occurrence of s
-(test-equal? "." '(5 3) (remove-first-wacked 3 '(1 2 3 5 3)))
+(test-equal? "" 3) (remove-first-wacked 3 '(1 2 3 5 3)))
 
 ; 1.9 
 
@@ -186,8 +185,8 @@
       [(eq? s (car los)) (remobe s (cdr los))]
       [(cons (car los) (remobe s (cdr los)))])))
 
-(test-equal? "." (remobe 3 '(1 2 3 4 3 2 1)) '(1 2 4 2 1))
-(test-equal? "." (remobe 3 '(3 3 3 3 3 3 3)) '())
+(test-equal? "" (remobe 3 '(1 2 3 4 3 2 1)) '(1 2 4 2 1))
+(test-equal? "" (remobe 3 '(3 3 3 3 3 3 3)) '())
 
 ; 1.10
 ; Inclusive: one, the other or both hold
@@ -202,12 +201,12 @@
       [else (or (occurs-free? var (car exp))
                 (occurs-free? var (cadr exp)))])))
 
-(test-true  "." (occurs-free? 'x 'x))
-(test-false "." (occurs-free? 'x 'y))
-(test-false "." (occurs-free? 'x '(lambda (x) (x y))))
-(test-true  "." (occurs-free? 'y '(lambda (x) (x y))))
-(test-true  "." (occurs-free? 'x '((lambda (x) x) (x y))))
-(test-true  "." (occurs-free? 'x '(lambda (y) (lambda (z) (x (y z))))))
+(test-true  "" (occurs-free? 'x 'x))
+(test-false "" (occurs-free? 'x 'y))
+(test-false ""ccurs-free? 'x '(lambda (x) (x y))))
+(test-true  "" (occurs-free? 'y '(lambda (x) (x y))))
+(test-true  "" (occurs-free? 'x '((lambda (x) x) (x y))))
+(test-true  "" (occurs-free? 'x '(lambda (y) (lambda (z) (x (y z))))))
 
 ; The value of an expression with no free variables is FIXED, and called Combinator
 ;   examples are: identity function, application function
@@ -226,8 +225,8 @@
          (cons new (subst new old (cdr los)))]
       [(cons (car los) (subst new old (cdr los)))])))
 
-(test-equal? "." (subst 5 3 '(1 2 3 4 5 3 3)) '(1 2 5 4 5 5 5))
-(test-equal? "." (subst 'a 'b '(b (b c) (b () d))) '(a (a c) (a () d)))
+(test-equal? "" (subst 5 3 '(1 2 3 4 5 3 3)) '(1 2 5 4 5 5 5))
+(test-equal? "" (subst 'a 'b '(b (b c) (b () d))) '(a (a c) (a () d)))
 
 ; that is how I woudl do it. Now lets do it mutually recursive
 ; follow the grammar !!!! nothing more <==== Very Important
@@ -250,8 +249,8 @@
       [(eq? old sex) new]
       [else sex])))
 
-(test-equal? "." (subst-lst 5 3 '(1 2 3 4 5 3 3)) '(1 2 5 4 5 5 5))
-(test-equal? "." (subst-lst 'a 'b '(b (b c) (b () d))) '(a (a c) (a () d)))
+(test-equal? "" (subst-lst 5 3 '(1 2 3 4 5 3 3)) '(1 2 5 4 5 5 5))
+(test-equal? "" (subst-lst 'a 'b '(b (b c) (b () d))) '(a (a c) (a () d)))
     
 ; 1.11 Why? I ask my self...
 ; because at that point we know that se is not a symbol, so it has to be a list
@@ -269,8 +268,8 @@
           (if (list? a) (subst-lst2 new old a) (if (eq? old a) new a))
           (subst-lst2 new old d)))])))
 
-(test-equal? "." (subst-lst2 5 3 '(1 2 3 4 5 3 3)) '(1 2 5 4 5 5 5))
-(test-equal? "." (subst-lst2 'a 'b '(b (b c) (b () d))) '(a (a c) (a () d)))
+(test-equal? "" (subst-lst2 5 3 '(1 2 3 4 5 3 3)) '(1 2 5 4 5 5 5))
+(test-equal? "" (subst-lst2 'a 'b '(b (b c) (b () d))) '(a (a c) (a () d)))
 
 ; 1.13 dont know what is map!! Forget it!
 
@@ -299,7 +298,7 @@
       [(symbol? sex) (cons sex (cons n '()))]
       [(notate-depth-lst sex (+ n 1))])))
 
-(test-equal? "." (notate-depth-top '(a (b () c) ((d)) e)) '((a 0) ((b 1) () (c 1)) (((d 2))) (e 0)))
+(test-equal? "" (notate-depth-top '(a (b () c) ((d)) e)) '((a 0) ((b 1) () (c 1)) (((d 2))) (e 0)))
 
 
 ; 1.14 pass
@@ -312,9 +311,9 @@
       [(zero? n) '()]
       [(cons x (duple (- n 1) x))])))
 
-(test-equal? "." (duple 2 3) '(3 3))
-(test-equal? "." (duple 3 '(ho ho)) '((ho ho) (ho ho) (ho ho)))
-(test-equal? "." (duple 0 '(blah)) '())
+(test-equal? "" (duple 2 3) '(3 3))
+(test-equal? "" (duple 3 '(ho ho)) '((ho ho) (ho ho) (ho ho)))
+(test-equal? "" (duple 0 '(blah)) '())
 
 ; 1.16
 ; <list> ::= () | ({<pair>*})
@@ -330,7 +329,7 @@
       [(null? lap) lap]
       [(cons (invert-pair (car lap)) (invert (cdr lap)))])))
 
-(test-equal? "." (invert '((a 1) (a 2) (b 1) (b 2))) '((1 a) (2 a) (1 b) (2 b)))
+(test-equal? "" (invert '((a 1) (a 2) (b 1) (b 2))) '((1 a) (2 a) (1 b) (2 b)))
 
 ; 1.17
 
@@ -342,9 +341,9 @@
        [(null? los) los]
        [(cons (wrap (car los)) (down (cdr los)))]))))
 
-(test-equal? "." (down '(1 2 3)) '((1) (2) (3)))
-(test-equal? "." (down '((a) (fine) (idea))) '(((a)) ((fine)) ((idea))))
-(test-equal? "." (down '(a (more (complicated)) object)) '((a) ((more (complicated))) (object)))
+(test-equal? "" (down '(1 2 3)) '((1) (2) (3)))
+(test-equal? "" (down '((a) (fine) (idea))) '(((a)) ((fine)) ((idea))))
+(test-equal? "" (down '(a (more (complicated)) object)) '((a) ((more (complicated))) (object)))
 
 ; 1.18
 
@@ -357,10 +356,10 @@
       [(eq? y (car los)) (cons x (swapper x y (cdr los)))]
       [else (cons (car los) (swapper x y (cdr los)))])))
 
-(test-equal? "." (swapper 'a 'd '(a b c d)) '(d b c a))
-(test-equal? "." (swapper 'a 'd '(a d () c d)) '(d a () c a))
-(test-equal? "." (swapper 'x 'y '((x) y (z (x)))) '((y) x (z (y))))
-(test-equal? "." (swapper 'x 'y '((x) y (w (z (x))))) '((y) x (w (z (y)))))
+(test-equal? "" (swapper 'a 'd '(a b c d)) '(d b c a))
+(test-equal? "" (swapper 'a 'd '(a d () c d)) '(d a () c a))
+(test-equal? "" (swapper 'x 'y '((x) y (z (x)))) '((y) x (z (y))))
+(test-equal? "" (swapper 'x 'y '((x) y (w (z (x))))) '((y) x (w (z (y)))))
 
 ; 1.19
 
@@ -371,8 +370,8 @@
       [(eq? (list-ref lis n) (car lis)) (cons x (cdr lis))]
       [else (cons (car lis) (list-set (cdr lis) (- n 1) x))])))
 
-(test-equal? "." (list-set '(a b c d) 2 '(1 2)) '(a b (1 2) d))
-(test-equal? "." (list-ref (list-set '(a b c d) 3 '(1 5 10)) 3) '(1 5 10))
+(test-equal? "" (list-set '(a b c d) 2 '(1 2)) '(a b (1 2) d))
+(test-equal? "" (list-ref (list-set '(a b c d) 3 '(1 5 10)) 3) '(1 5 10))
 
 ; 1.20
 
@@ -384,9 +383,9 @@
       [(eq? s (car lis)) (+ 1 (count-occurrences s (cdr lis)))]
       [(count-occurrences s (cdr lis))])))
 
-(test-equal? "." (count-occurrences 'x '((f x) y (((x z) x)))) 3)
-(test-equal? "." (count-occurrences 'x '((f x) y (((x z) () x)))) 3)
-(test-equal? "." (count-occurrences 'w '((f x) y (((x z) x)))) 0)
+(test-equal? "" (count-occurrences 'x '((f x) y (((x z) x)))) 3)
+(test-equal? "" (count-occurrences 'x '((f x) y (((x z) () x)))) 3)
+(test-equal? "" (count-occurrences 'w '((f x) y (((x z) x)))) 0)
 
 ; 1.21
 
@@ -407,11 +406,11 @@
         [(glue (zip (car los1) los2)
                (product (cdr los1) los2))]))))
 
-(test-equal? "." (product '(a b c) '(x y)) '((a x) (a y) (b x) (b y) (c x) (c y)))
+(test-equal? "" (product '(a b c) '(x y)) '((a x) (a y) (b x) (b y) (c x) (c y)))
 
-(test-equal? "." (product '(a b) '(x)) '((a x) (b x)))
-(test-equal? "." (product '(a b) '()) '())
-(test-equal? "." (product '() '(x y)) '())
+(test-equal? "" (product '(a b) '(x)) '((a x) (b x)))
+(test-equal? "" (product '(a b) '()) '())
+(test-equal? "" (product '() '(x y)) '())
 
 ; 1.22
 
@@ -422,8 +421,8 @@
       [(pred (car los)) (cons (car los) (filter-in pred (cdr los)))]
       [(filter-in pred (cdr los))])))
 
-(test-equal? "." (filter-in number? '(a 2 (1 3) b 7)) '(2 7))
-(test-equal? "." (filter-in symbol? '(a (b c) 17 foo)) '(a foo))
+(test-equal? "" (filter-in number? '(a 2 (1 3) b 7)) '(2 7))
+(test-equal? "" (filter-in symbol? '(a (b c) 17 foo)) '(a foo))
 
 ; 1.23 (done with vectors instead of lists because of 2nd edition)
 
@@ -437,8 +436,8 @@
                        [else (traverse (- n 1))]))])
          (traverse (- (vector-length v) 1)))))
 
-(test-equal? "." (vector-index (lambda (x) (eqv? x 'c)) '#(a b c d)) 2)
-(test-equal? "." (vector-ref '#(a b c) (vector-index (lambda (x) (eqv? x 'b)) '#(a b c))) 'b)
+(test-equal? "" (vector-index (lambda (x) (eqv? x 'c)) '#(a b c d)) 2)
+(test-equal? "" (vector-ref '#(a b c) (vector-index (lambda (x) (eqv? x 'b)) '#(a b c))) 'b)
 
 ; 1.24
 
@@ -449,8 +448,8 @@
       [(pred (car los)) (every? pred (cdr los))]
       [else #f])))
 
-(test-false "." (every? number? '(a b c 3 e)))
-(test-true  "." (every? number? '(1 2 3 5 4)))
+(test-false "" (every? number? '(a b c 3 e)))
+(test-true  "" (every? number? '(1 2 3 5 4)))
 
 ; 1.25
 
@@ -461,8 +460,8 @@
       [(pred (car los)) #t]
       [else (exists? pred (cdr los))])))
 
-(test-true  "." (exists? number? '(a b c 3 e)))
-(test-false "." (exists? number? '(a b c d e)))
+(test-true  "" (exists? number? '(a b c 3 e)))
+(test-false "" (exists? number? '(a b c d e)))
 
 ; 1.26
 
@@ -479,8 +478,8 @@
         [(glue (car l) (up (cdr l)))]))))
     
 
-(test-equal? "." (up '((1 2) (3 4))) '(1 2 3 4))
-(test-equal? "." (up '((x (y)) z)) '(x (y) z))
+(test-equal? "" (up '((1 2) (3 4))) '(1 2 3 4))
+(test-equal? "" (up '((x (y)) z)) '(x (y) z))
 
 ; 1.27
 
@@ -497,10 +496,10 @@
         [(cons (car lis) (flat! (cdr lis)))]
       ))))
 
-(test-equal? "." (flat! '(a b c)) '(a b c))
-(test-equal? "." (flat! '((a) () (b ()) () (c))) '(a b c))
-(test-equal? "." (flat! '((a b) c (((d)) e))) '(a b c d e))
-(test-equal? "." (flat! '(a b (() (c)))) '(a b c))
+(test-equal? "" (flat! '(a b c)) '(a b c))
+(test-equal? "" (flat! '((a) () (b ()) () (c))) '(a b c))
+(test-equal? "" (flat! '((a b) c (((d)) e))) '(a b c d e))
+(test-equal? "" (flat! '(a b (() (c)))) '(a b c))
 
 ; 1.28
 
@@ -516,8 +515,8 @@
         [(null? lon1) lon2]
         [(merge (cdr lon1) (insert (car lon1) lon2))]))))
 
-(test-equal? "." (merge '(1 4) '(1 2 8)) '(1 1 2 4 8))
-(test-equal? "." (merge '(35 62 81 90 91) '(3 83 85 90)) '(3 35 62 81 83 85 90 90 91))
+(test-equal? "" (merge '(1 4) '(1 2 8)) '(1 1 2 4 8))
+(test-equal? "" (merge '(35 62 81 90 91) '(3 83 85 90)) '(3 35 62 81 83 85 90 90 91))
 
 ; 1.29
 
@@ -535,7 +534,7 @@
                   [(worker (cdr input) (insert (car input) output))]))])
       (worker l '()))))
 
-(test-equal? "." (sorti '(8 2 5 2 3)) '(2 2 3 5 8))
+(test-equal? "" (sorti '(8 2 5 2 3)) '(2 2 3 5 8))
 
 ; 1.30
 
@@ -554,8 +553,8 @@
       (worker l '()))))
 
 
-(test-equal? "." (sortλ < '(8 2 5 2 3)) '(2 2 3 5 8))
-(test-equal? "." (sortλ > '(8 2 5 2 3)) '(8 5 3 2 2))
+(test-equal? "" (sortλ < '(8 2 5 2 3)) '(2 2 3 5 8))
+(test-equal? "" (sortλ > '(8 2 5 2 3)) '(8 5 3 2 2))
 
 ; 1.31 Bintree ::= Int | (Symbol Bintree Bintree)
 
@@ -588,9 +587,9 @@
       [else (cons (contents-of (lson tree))
                         (cons (contents-of (rson tree)) '()))])))
 
-(test-equal? "." (contents-of 2) 2)
-(test-equal? "." (contents-of '(1 2 3)) '(2 3))
-(test-equal? "." (contents-of '(baz (bar 1 (foo 1 2)) (biz 4 5))) '((1 (1 2)) (4 5)))
+(test-equal? "" (contents-of 2) 2)
+(test-equal? "" (contents-of '(1 2 3)) '(2 3))
+(test-equal? "" (contents-of '(baz (bar 1 (foo 1 2)) (biz 4 5))) '((1 (1 2)) (4 5)))
 
 ; 1.32
 
@@ -600,10 +599,10 @@
         (* 2 tree)
         (interior-node (car tree) (double-tree (lson tree)) (double-tree (rson tree))))))
 
-(test-equal? "." (double-tree 2) '4)
-(test-equal? "." (double-tree '(foo 1 2)) '(foo 2 4))
-(test-equal? "." (double-tree '(bar 1 (foo 1 2))) '(bar 2 (foo 2 4)))
-(test-equal? "." (double-tree '(baz (bar 1 (foo 1 2)) (biz 4 5))) '(baz (bar 2 (foo 2 4)) (biz 8 10)))
+(test-equal? "" (double-tree 2) '4)
+(test-equal? "" (double-tree '(foo 1 2)) '(foo 2 4))
+(test-equal? "" (double-tree '(bar 1 (foo 1 2))) '(bar 2 (foo 2 4)))
+(test-equal? "" (double-tree '(baz (bar 1 (foo 1 2)) (biz 4 5))) '(baz (bar 2 (foo 2 4)) (biz 8 10)))
 
 ; 1.33
 
@@ -619,7 +618,7 @@
                     (interior-node (car t) (M (lson t) n) (M (rson t) n))]))])
       (M tree 0))))
 
-(test-equal? "." (mark-leaves-with-red-depth
+(test-equal? "" (mark-leaves-with-red-depth
                   (interior-node 'red
                                  (interior-node 'bar
                                                 (leaf 26)
@@ -658,13 +657,13 @@
 ;                          /
 ;                         17
 
-(test-equal? "." (path 17 '(14 (7 () (12 () ()))
+(test-equal? "" (path 17 '(14 (7 () (12 () ()))
                                (26 (20 (17 () ())
                                        ())
                                    (31 () ()))))
              '(right left left))
 
-(test-equal? "." (path 14 '(14 (7 () (12 () ()))
+(test-equal? "" (path 14 '(14 (7 () (12 () ()))
                                (26 (20 (17 () ())
                                        ())
                                    (31 () ()))))
@@ -682,7 +681,7 @@
         (N tree)))))
 
 
-(test-equal? "." (number-leaves
+(test-equal? "" (number-leaves
                   (interior-node 'foo
                                  (interior-node 'bar
                                                 (leaf 26)
@@ -709,4 +708,4 @@
     (if (null? lst) '()
         (g (list 0 (car lst)) (number-elements (cdr lst))))))
 
-(test-equal? "." (number-elements '(a b c d)) '((0 a) (1 b) (2 c) (3 d)))
+(test-equal? "" (number-elements '(a b c d)) '((0 a) (1 b) (2 c) (3 d)))
