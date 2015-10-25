@@ -54,6 +54,32 @@
 (check-equal? (factorial '(3)) '(6))
 ;; (factorial '(10))
 
+;; Exercise 2.4
+
+; empty-stack : () -> Stack
+(define (empty-stack) '())
+; push : Element x Stack -> Stack
+(define (push e s) (cons e s))
+; pop : Stack -> Stack
+(define (pop s) (cdr s))
+; top : Stack -> Element
+(define (top s) (car s))
+; empty-stack? : Stack -> Boolean
+(define (empty-stack? s) (null? s))
+
+(define s
+  (push 'x
+    (push 'y
+      (push 'z
+        (empty-stack)))))
+
+(check-false (empty-stack? s))
+(check-equal? (top s) 'x)
+(check-equal? (top (pop (pop s))) 'z)
+
+;; empty-stack, push, & pop are constructors
+;; empty-stack? & top are observers
+
 ;; Exercise 2.5
 (define (report-no-binding-found search-var)
   (eopl:error 'apply-env "No binding found for ~s" search-var))
@@ -148,3 +174,26 @@
 (check-equal? (apply-env e* 'x) 7)
 (check-equal? (apply-env e* 'y) 5)
 (check-equal? (apply-env e* 'b) 2)
+
+;; Exercise 2.12
+(define (empty-stack*)
+  (lambda ()
+    '()))
+(define (push* e s)
+  (lambda ()
+    `(,e ,s)))
+(define (pop* s) (cadr (s)))
+(define (top* s) (car (s)))
+(define (empty-stack?* s) (null? (s)))
+
+(define s*
+  (push* 'x
+    (push* 'y
+      (push* 'z
+        (empty-stack*)))))
+
+(check-false (empty-stack?* s*))
+(check-equal? (top* s*) 'x)
+(check-equal? (top* (pop* s*)) 'y)
+(check-equal? (top* (pop* (pop* s*))) 'z)
+
