@@ -753,4 +753,53 @@
 (test-equal? "" (insert-to-left-branch 15 t1) '(13 (15 (12 () ()) ()) (14 () ())))
 
 ; 2.20 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; weekend fodder!
+; Bintree  ::= () | (Int (Bintree Bintree))
+; Memotree ::= () | tree | (Bintree Memotree)   ; stack of Bintrees
+; Sototree ::= (Bintree Memotree)
+
+(define memo->empty (λ() '()))
+(define memo->push  (λ(x m) (cons x m)))
+(define memo->pull  (λ(m) (cdr m)))
+
+(define st-tree (lambda (st) (car st)))
+(define st-memo (lambda (st) (car (cdr st))))
+    
+(define n->sototree (lambda (n) (list (number->bintree n) (memo->empty))))
+(define st-node (lambda (st) (current-node (st-tree st))))
+
+(define soto->go-left
+  (lambda (st)
+    (let ([T (st-tree st)] [M (st-memo st)])
+      (list (move-to-left-son T)
+            (memo->push (list (current-node T) #f (right-branch T)) M)))))
+  
+(define soto->go-right
+  (lambda (st)
+    (let ([T (st-tree st)] [M (st-memo st)])
+      (list (move-to-right-son T)
+            (memo->push (list (current-node T) (left-branch T) #f) M)))))
+
+(define soto-add-left
+  (lambda (n st)
+    (list (insert-to-left-branch n (st-tree st)) (st-memo st))))
+
+(define soto-add-right
+  (lambda (n st)
+    (list (insert-to-right-branch n (st-tree st)) (st-memo st))))
+
+(define soto->go-up
+  (lambda (st)
+    (let ([dad (car (st-memo st))] [T (st-tree st)])
+      (list
+       (cons (current-node dad)
+             (if (left-branch dad) (list (left-branch dad) T) (list T (right-branch dad))))
+       (memo->pull (st-memo st))))))
+  
+(define @leaf? (λ(st) (at-leaf? (st-tree st))))
+(define @root? (λ(st) (null? (st-memo st))))
+
+(define t3 (soto-add-right 14 (soto-add-left 12 (n->sototree 13))))
+(test-equal? "" t3 (list t1 (memo->empty)))
+(test-equal? "" (soto->go-left t3) '((12 () ()) ((13 #f (14 () ())))))
+(test-equal? "" (soto->go-up (soto->go-left t3)) t3)
+(test-true   "" (@root? (soto->go-up (soto->go-right (soto->go-up (soto->go-left t3))))))
