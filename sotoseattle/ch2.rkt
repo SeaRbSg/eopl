@@ -779,11 +779,11 @@
       (list (move-to-right-son T)
             (memo->push (list (current-node T) (left-branch T) #f) M)))))
 
-(define soto-add-left
+(define soto->add-left
   (lambda (n st)
     (list (insert-to-left-branch n (st-tree st)) (st-memo st))))
 
-(define soto-add-right
+(define soto->add-right
   (lambda (n st)
     (list (insert-to-right-branch n (st-tree st)) (st-memo st))))
 
@@ -798,8 +798,333 @@
 (define @leaf? (λ(st) (at-leaf? (st-tree st))))
 (define @root? (λ(st) (null? (st-memo st))))
 
-(define t3 (soto-add-right 14 (soto-add-left 12 (n->sototree 13))))
+(define t3 (soto->add-right 14 (soto->add-left 12 (n->sototree 13))))
 (test-equal? "" t3 (list t1 (memo->empty)))
 (test-equal? "" (soto->go-left t3) '((12 () ()) ((13 #f (14 () ())))))
 (test-equal? "" (soto->go-up (soto->go-left t3)) t3)
 (test-true   "" (@root? (soto->go-up (soto->go-right (soto->go-up (soto->go-left t3))))))
+
+; 2.21 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Env = (empty-env) | (extend-env Var SchemeVal Env)
+; Var = Sym
+
+(define-datatype Env Env?
+   (empty-env-dt)
+   (extend-env-dt
+    (saved-var symbol?)
+    (saved-val number?)
+    (saved-env Env?)))
+
+(define apply-env-dt
+  (lambda (E V)
+    (cases Env E
+      (empty-env-dt () #f) ; for me is better with false
+      (extend-env-dt (saved-var saved-val saved-env)
+                     (if (eqv? saved-var V) saved-val (apply-env-dt saved-env V))))))
+
+(define empty-env-dt?
+  (lambda (E)
+    (cases Env E
+      (empty-env-dt () #t)
+      (else #f))))
+
+(define has-binding-dt?
+  (lambda (E V)
+    (number? (apply-env-dt E V))))
+    
+(define edt
+  (extend-env-dt 'd 6
+    (extend-env-dt 'y 8
+      (extend-env-dt 'x 7
+        (extend-env-dt 'y 14
+          (empty-env-dt))))))
+
+(test-true   "" (empty-env-dt? (empty-env-dt)))
+(test-false  "" (empty-env-dt? edt))
+(test-equal? "" (apply-env-dt edt 'x) 7)
+(test-equal? "" (apply-env-dt edt 'y) 8)
+(test-false  "" (apply-env-dt edt 'z))
+(test-false  "" (has-binding-dt? edt 'z))
+(test-true   "" (has-binding-dt? edt 'x))
+(test-false  "" (has-binding-dt? (empty-env-dt) 'x))
+
+; 2.22 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define-datatype stack-dt stack-dt?
+  (empty-stack-dt)
+  (push-dt
+     (val number?)
+     (stack-dt stack-dt?)))
+
+(define empty-stack-dt?
+  (lambda (stk)
+    (cases stack-dt stk
+      (empty-stack-dt () #t)
+      (else #f))))
+
+(define top-dt
+  (lambda (stk)
+    (cases stack-dt stk
+      (empty-stack-dt () #f)
+      (push-dt (val stack-dt) val))))
+
+(define pull-dt
+  (lambda (stk)
+    (cases stack-dt stk
+      (empty-stack-dt () #f)
+      (push-dt (val stack-dt) stack-dt))))
+
+(define sdt
+  (push-dt 6
+    (push-dt 8
+      (push-dt 7
+        (push-dt 14
+          (empty-stack-dt))))))
+
+(test-false  "" (empty-stack-dt? sdt))
+(test-equal? "" (top-dt sdt) 6)
+(test-equal? "" (top-dt (pull-dt sdt)) 8)
+(test-true   "" (empty-stack-dt? (pull-dt (pull-dt (pull-dt (pull-dt sdt))))))
+(test-false  "" (empty-stack-dt? (pull-dt (pull-dt (pull-dt sdt)))))
+
+; 2.23 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define valid-var-23?
+  (lambda (x) 
+    (not (and (symbol? x)
+              (list? x)
+              (vector? x)
+              (number? x)
+              (boolean? x)
+              (or (equal? x 'lambda) (equal? x 'λ))))))
+
+(define-datatype lc-exp-23 lc-exp-23? 
+  (var-exp-23
+   (var valid-var-23?))
+  (lambda-exp-23
+   (lolailo lambda?)                                      ; diff
+   (bound-var valid-var-23?)
+   (body lc-exp-23?))
+  (app-exp-23
+   (rator lc-exp-23?)
+   (rand lc-exp-23?)))
+
+(define lambda? (λ(x) (equal? x 'lambda)))                  ; diff
+  
+(define occurs-freak?
+  (lambda (search-var exp)
+    (cases lc-exp-23 exp
+      (var-exp-23 (var) (eqv? var search-var))
+      (lambda-exp-23 (lolailo bound-var body)             ; diff
+                  (and (not (eqv? search-var bound-var))
+                       (occurs-freak? search-var body)))
+      (app-exp-23 (rator rand)
+               (or (occurs-freak? search-var rator)
+                   (occurs-freak? search-var rand))))))
+
+; 2.24 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define-datatype bintree bintree?
+  (leaf-node
+   (num integer?))
+  (interior-node
+   (key symbol?)
+   (left bintree?)
+   (right bintree?)))
+
+(define bintree-to-list
+  (lambda (T)
+    (cases bintree T
+      (leaf-node (n) (list 'leaf-node n))
+      (interior-node (k l r) (list k (bintree-to-list l) (bintree-to-list r))))))
+
+(test-equal? "" (bintree-to-list (interior-node 'a (leaf-node 3) (leaf-node 4)))
+                '(a (leaf-node 3) (leaf-node 4)))
+
+; 2.25 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define tree-1 (interior-node 'foo (leaf-node 2) (leaf-node 3)))
+(define tree-2 (interior-node 'bar (leaf-node -1) tree-1))
+(define tree-3 (interior-node 'baz tree-2 (leaf-node 1)))
+
+(define tree-key
+  (lambda (T)
+    (cases bintree T
+      (interior-node (k l r) k)
+      (else #f))))
+
+(define max-interior ; pretty fugly
+  (lambda (T)
+    (let ([max-key #f] [max-val 0])
+      (letrec ((traverse
+                (lambda (t)
+                  (cases bintree t
+                    (leaf-node (n) n)
+                    (interior-node (k l r)
+                                   (let ([ML (traverse l)] [MR (traverse r)])
+                                     (let ([MX (max (+ ML MR) ML MR)])
+                                       (cond
+                                         [(equal? ML MX) (set! max-key (tree-key l))]
+                                         [(equal? MR MX) (set! max-key (tree-key r))]
+                                         [else (set! max-key k)])
+                                       (set! max-val MX))
+                                     (+ ML MR)))))))
+        (traverse T)
+        (list max-key max-val)))))           
+
+(test-equal? "" (max-interior tree-2) '(foo 5))
+(test-equal? "" (max-interior tree-3) '(baz 5))
+
+; 2.26 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Red-blue-tree    ::= Red-blue-subtree
+; Red-blue-subtree ::= (red-node Red-blue-subtree Red-blue-subtree)
+;                  ::= (blue-node {Red-blue-subtree}∗)
+;                  ::= (leaf-node Int)
+  
+(define-datatype tree-rb tree-rb?
+  (leafy-node
+   (num integer?))
+  (red-node
+   (rbt1 tree-rb?)(rbt2 tree-rb?))
+  (blue-node-single
+    (rbt1 tree-rb?))
+  (blue-node-multi
+    (rbt1 tree-rb?)
+    (blue-node-multi tree-rb?)))
+
+(define mark-red-depth
+  (lambda (tree)
+    (letrec
+        ([M (lambda (t n)
+              (cases tree-rb t
+                (leafy-node (m) (leafy-node n))
+                (blue-node-single (head) (blue-node-single (M head n)))
+                (blue-node-multi (head tail) (blue-node-multi (M head n) (M tail n)))
+                (red-node (t1 t2) 
+                          (red-node (M t1 (+ n 1)) (M t2 (+ n 1))))))])
+      (M tree 0))))
+
+(define pepe
+  (red-node
+   (blue-node-multi
+    (leafy-node 26)
+    (leafy-node 12))
+   (red-node
+    (leafy-node 11)
+    (blue-node-multi
+     (leafy-node 117)
+     (leafy-node 14)))))
+
+(test-equal? "" (mark-red-depth pepe)
+                (red-node
+                 (blue-node-multi
+                  (leafy-node 1)
+                  (leafy-node 1))
+                 (red-node
+                  (leafy-node 2)
+                  (blue-node-multi
+                   (leafy-node 2)
+                   (leafy-node 2)))))
+
+; 2.27 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; ((lambda (a) (a b)) c)
+;
+;                                 app-exp
+;                               /         \
+;                              /           \
+;                             /             \
+;                         rator             rand
+;                           |                 |
+;                     lambda-exp              |
+;                    /          \          var-exp
+;                   /            \            |
+;                  /              \           c
+;             bound var         app-exp
+;                 |              /    \
+;                 a             /      \
+;                            rator     rand
+;                              |         |
+;                              |         |
+;                           var-exp   var-exp
+;                              |         |
+;                              a         b
+
+; (lambda (x)
+;    (lambda (y)
+;      ((lambda (x)
+;         (x y))
+; x)))
+;
+;                                 lambda-exp
+;                                 /         \
+;                                /           \
+;                               /             \
+;                         bound var           lambda-exp
+;                             |                /        \
+;                             x               /          \
+;                                            /            \
+;                                      bound var          app-exp
+;                                          |             /       \
+;                                          y            /         \
+;                                                    rator       rand
+;                                                     /             \
+;                                                lambda-exp        var-exp
+;                                                /        \           |
+;                                               /          \          x
+;                                              /            \
+;                                        bound var        app-exp
+;                                            |            /     \
+;                                            x           /       \
+;                                                      rator    rand
+;                                                        |        |
+;                                                     var-exp  var-exp
+;                                                        |         |
+;                                                        x         y
+
+; 2.28 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define valid-var?
+  (lambda (x) 
+    (not (and (symbol? x) (list? x) (vector? x) (number? x) (boolean? x))))) ; brutal, I know
+
+(define-datatype lc-exp lc-exp?
+  (Var-exp
+   (var valid-var?))
+  (Lambda-exp
+   (bound-var valid-var?)
+   (body lc-exp?))
+  (App-exp
+   (rator lc-exp?)
+   (rand lc-exp?)))
+
+(define unparse!
+  (lambda (exp)
+    (cases lc-exp exp
+      (Var-exp (var) (symbol->string var))
+      (Lambda-exp(bound-var body)
+                  (format "(lambda (~A) (~A)" bound-var (unparse! body)))
+      (App-exp (rator rand)
+               (format "(~A ~A)" (unparse! rator) (unparse! rand))))))
+
+(define parse!
+  (lambda (datum)
+    (cond
+      ((symbol? datum) (Var-exp datum))
+      ((list? datum)
+       (if (eqv? (car datum) 'lambda)
+           (Lambda-exp (car (cadr datum))
+                       (parse! (caddr datum)))
+           (App-exp
+            (parse! (car datum))
+            (parse! (cadr datum)))))
+      (else #f))))
+    
+(define fifi
+   (App-exp
+    (Lambda-exp 'a (App-exp (Var-exp 'a) (Var-exp 'b)))
+    (Var-exp 'c)))
+
+(test-equal? "" (parse! '((lambda (a) (a b)) c)) fifi)
+(test-equal? "" (unparse! (parse! '((lambda (a) (a b)) c))) "((lambda (a) ((a b)) c)")
+
+; 2.29 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

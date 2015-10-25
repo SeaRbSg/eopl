@@ -174,7 +174,7 @@
       [(remove-first-wacked s (cdr los))])))
 
 ; gives the cdr of the list after the first occurrence of s
-(test-equal? "" 3) (remove-first-wacked 3 '(1 2 3 5 3)))
+(test-equal? "" (remove-first-wacked 3 '(1 2 3 5 3)) '(5 3))
 
 ; 1.9 
 
@@ -203,7 +203,7 @@
 
 (test-true  "" (occurs-free? 'x 'x))
 (test-false "" (occurs-free? 'x 'y))
-(test-false ""ccurs-free? 'x '(lambda (x) (x y))))
+(test-false "" (occurs-free? 'x '(lambda (x) (x y))))
 (test-true  "" (occurs-free? 'y '(lambda (x) (x y))))
 (test-true  "" (occurs-free? 'x '((lambda (x) x) (x y))))
 (test-true  "" (occurs-free? 'x '(lambda (y) (lambda (z) (x (y z))))))
