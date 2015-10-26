@@ -1128,3 +1128,86 @@
 (test-equal? "" (unparse! (parse! '((lambda (a) (a b)) c))) "((lambda (a) ((a b)) c)")
 
 ; 2.29 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define listo
+  (lambda (predicador)
+    (lambda (val)
+      (if (list? val)
+          (and (predicador (car val)) ((listo predicador) (cdr val)))
+          (predicador val)))))
+
+(define-datatype λexp λexp?
+  (λvar
+   (var valid-var?))
+  (λfun
+   (bound-var (listo valid-var?))
+   (body λexp?))
+  (λapp
+   (rator λexp?)
+   (rand (listo λexp?))))
+
+(define λunparse!
+  (lambda (exp)
+    (cases λexp exp
+      (λvar (var) (symbol->string var))
+      (λfun (bound-var body) (format "(lambda (~A) (~A)" bound-var (λunparse! body)))
+      (λapp (rator rand) (format "(~A ~A)" (λunparse! rator) (λunparse! rand))))))
+
+(define λparse!
+  (lambda (datum)
+    (cond
+      ((symbol? datum) (λvar datum))
+      ((list? datum)
+       (if (eqv? (car datum) 'lambda)
+           (λfun (car (cadr datum)) (λparse! (caddr datum)))
+           (λapp (λparse! (car datum)) (λparse! (cadr datum)))))
+      (else #f))))
+    
+(define chuchi (λapp (λfun 'a (λapp (λvar 'a) (λvar 'b))) (λvar 'c)))
+(test-equal? "" (λparse! '((lambda (a) (a b)) c)) chuchi)
+(test-equal? "" (λunparse! (λparse! '((lambda (a) (a b)) c))) "((lambda (a) ((a b)) c)")
+
+; 2.30 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; sorry, I do not give a shit about this exercise
+
+; 2.31 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; STUCK!!
+; Prefix-list ::=(Prefix-exp)
+; Prefix-exp  ::= Int
+;             ::= Prefix-exp Prefix-exp
+
+(define-datatype prefix-list prefix-list?
+  (prefix-thing
+   (prefix-exp prefix-exp?)))
+
+(define-datatype prefix-exp prefix-exp?
+  (const-exp
+   (num integer?))
+  (diff-exp
+   (operand1 prefix-exp?)
+   (operand2 prefix-exp?)))
+
+(define conchita
+  (diff-exp
+   (diff-exp
+    (const-exp 3)
+    (const-exp 2))
+   (diff-exp
+    (const-exp 4)
+    (diff-exp
+     (const-exp 12)
+     (const-exp 7)))))
+
+(define prex-parse
+  (lambda (l) l
+    ))
+
+;(prex-parse '(2))
+;(prex-parse '(- 3 2))
+;(prex-parse '(- - 3 2 4))
+;(prex-parse '(- - 3 2 - 4 - 12 7))
+;conchita
+
+
+
+
+
