@@ -197,3 +197,120 @@
 (check-equal? (top* (pop* s*)) 'y)
 (check-equal? (top* (pop* (pop* s*))) 'z)
 
+;; Exercise 2.15
+; Lambda calculus grammar
+; Le-exp ::= Identifer
+;        ::= (lambda (Identifier) Le-exp)
+;        ::= (Le-exp Le-exp)
+
+
+; lambda-exp : Identifier x Le-exp -> Le-exp
+(define (lambda-exp var val)
+  `(lambda ,var ,val))
+
+; lambda-exp? : Le-exp -> Boolean
+(define (lambda-exp? exp)
+  (eqv? (car exp) 'lambda))
+
+; lambda-exp->bound-var : Le-exp -> Var
+(define (lambda-exp->bound-var exp)
+  (cadr exp))
+
+; lambda-exp->body : Le-exp -> Le-exp
+(define (lambda-exp->body exp)
+  (caddr exp))
+
+(define l (lambda-exp 'x 10))
+
+(check-true (lambda-exp? l))
+(check-equal? (lambda-exp->bound-var l) 'x)
+(check-equal? (lambda-exp->body l) 10)
+
+;; Exercise 2.16
+; I think I already did that? Or I'm missing this completely.
+
+;; Exercise 2.17
+
+; var-exp : Var -> Le-exp
+(define (var-exp var)
+  `(var ,var))
+
+; var-exp? : Le-exp -> Boolean
+(define (var-exp? exp)
+  (eqv? (car exp) 'var))
+
+; var-exp->var : Le-exp -> Var
+(define (var-exp->var exp)
+  (cadr exp))
+
+(define v (var-exp 10))
+(check-true (var-exp? v))
+(check-equal? (var-exp->var v) 10)
+
+;; only doing one...
+
+;; Exercise 2.18
+; NodeInSequence ::= (Int Listof(Int) Listof(Int))
+
+; number->sequence : Int -> NodeInSequence
+(define (number->sequence n)
+  `(,n () ()))
+
+(check-equal? (number->sequence 7) '(7 () ()))
+
+; at-end-left? : NodeInSequence -> Bool
+(define (at-end-left? seq)
+  (null? (cadr seq)))
+
+(check-true (at-end-left? '(1 () (2 3))))
+
+; at-end-right? : NodeInSequence -> Bool
+(define (at-end-right? seq)
+  (null? (caddr seq)))
+
+(check-true (at-end-right? '(1 (2 3) ())))
+
+; current-element : NodeInSequence -> Int
+(define (current-element seq)
+  (car seq))
+
+(check-equal? (current-element '(6 (5 4 3 2 1) (7 8 9))) 6)
+
+; move-to-left : NodeInSequence -> NodeInSequence
+(define (move-to-left seq)
+  (cons (caadr seq)
+        (list (cdadr seq)
+              (cons (car seq) (caddr seq)))))
+
+(check-equal? (move-to-left '(6 (5 4 3 2 1) (7 8 9)))
+              '(5 (4 3 2 1) (6 7 8 9)))
+
+
+; move-to-right : NodeInSequence -> NodeInSequence
+(define (move-to-right seq)
+  (cons (caaddr seq)
+        (list (cons (car seq) (cadr seq))
+              (cdaddr seq))))
+
+(check-equal? (move-to-right '(6 (5 4 3 2 1) (7 8 9)))
+              '(7 (6 5 4 3 2 1) (8 9)))
+
+; insert-to-left : Int x NodeInSequence -> NodeInSequence
+(define (insert-to-left n seq)
+  (cons (car seq)
+        (list (cons n (cadr seq))
+              (caddr seq))))
+
+(check-equal? (insert-to-left 13 '(6 (5 4 3 2 1) (7 8 9)))
+              '(6 (13 5 4 3 2 1) (7 8 9)))
+
+; insert-to-right : Int x NodeInSequence -> NodeInSequence
+(define (insert-to-right n seq)
+  (cons (car seq)
+        (list (cadr seq)
+              (cons n (caddr seq)))))
+
+(check-equal? (insert-to-right 13 '(6 (5 4 3 2 1) (7 8 9)))
+              '(6 (5 4 3 2 1) (13 7 8 9)))
+
+;; didn't add error checking...
