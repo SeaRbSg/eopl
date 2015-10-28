@@ -16,13 +16,13 @@
                       (+ (* (car b) (expt N n)) (B (cdr b) (+ n 1)))))])
       (B biggie 0))))
 
-(test-equal? "" (to-int '()) 0)
-(test-equal? "" (to-int '(0)) 0)
-(test-equal? "" (to-int '(1)) 1)
-(test-equal? "" (to-int '(1 2)) 33)
-(test-equal? "" (to-int '(2 0 1)) 258)
-(test-equal? "" (to-int '(18)) (to-int '(2 1)))
-(test-equal? "" (+ 1 (to-int '(15 15 15 15))) (to-int '(0 0 0 0 1)))
+(check-equal? (to-int '()) 0)
+(check-equal? (to-int '(0)) 0)
+(check-equal? (to-int '(1)) 1)
+(check-equal? (to-int '(1 2)) 33)
+(check-equal? (to-int '(2 0 1)) 258)
+(check-equal? (to-int '(18)) (to-int '(2 1)))
+(check-equal? (+ 1 (to-int '(15 15 15 15))) (to-int '(0 0 0 0 1)))
 
 
 (define successor
@@ -35,13 +35,13 @@
                       [else (cons 0 (successor (cdr b)))]))])
         (S biggie)))))
 
-(test-equal? "" (successor '()) '(1))
-(test-equal? "" (successor '(1)) '(2))
-(test-equal? "" (successor '(14)) '(15))
-(test-equal? "" (successor '(15)) '(0 1))
-(test-equal? "" (successor '(15 1)) '(0 2))
-(test-equal? "" (successor '(15 15 1 1)) '(0 0 2 1))
-(test-equal? "" (successor '(15 15 15 15)) '(0 0 0 0 1))
+(check-equal? (successor '()) '(1))
+(check-equal? (successor '(1)) '(2))
+(check-equal? (successor '(14)) '(15))
+(check-equal? (successor '(15)) '(0 1))
+(check-equal? (successor '(15 1)) '(0 2))
+(check-equal? (successor '(15 15 1 1)) '(0 0 2 1))
+(check-equal? (successor '(15 15 15 15)) '(0 0 0 0 1))
 
 (define predecessor
   (lambda (biggie)
@@ -53,13 +53,13 @@
                       [else (cons LIM (P (cdr b)))]))])
         (P biggie)))))
 
-(test-equal? "" (predecessor '(1))         '())
-(test-equal? "" (predecessor '(2))         '(1))
-(test-equal? "" (predecessor '(15))        '(14))
-(test-equal? "" (predecessor '(0 1))       '(15))
-(test-equal? "" (predecessor '(0 2))       '(15 1))
-(test-equal? "" (predecessor '(0 0 2 1))   '(15 15 1 1))
-(test-equal? "" (predecessor '(0 0 0 0 1)) '(15 15 15 15))
+(check-equal? (predecessor '(1))         '())
+(check-equal? (predecessor '(2))         '(1))
+(check-equal? (predecessor '(15))        '(14))
+(check-equal? (predecessor '(0 1))       '(15))
+(check-equal? (predecessor '(0 2))       '(15 1))
+(check-equal? (predecessor '(0 0 2 1))   '(15 15 1 1))
+(check-equal? (predecessor '(0 0 0 0 1)) '(15 15 15 15))
 
 (define plus
   (lambda (a b)
@@ -67,8 +67,8 @@
       [(is-zero? a) b]
       [(plus (predecessor a) (successor b))])))
 
-(test-equal? "" (plus '(4)  '(2)) '(6))
-(test-equal? "" (plus '(15) '(2)) '(1 1))
+(check-equal? (plus '(4)  '(2)) '(6))
+(check-equal? (plus '(15) '(2)) '(1 1))
 
 (define multi
   (lambda (a b)
@@ -76,18 +76,18 @@
       [(is-zero? a) (zero)]
       [(plus b (multi (predecessor a) b))])))
 
-(test-equal? "" (multi '(3) '(2)) '(6))
-(test-equal? "" (multi '(8) '(2)) '(0 1))
-       
+(check-equal? (multi '(3) '(2)) '(6))
+(check-equal? (multi '(8) '(2)) '(0 1))
+
 (define factorial
   (lambda (n)
     (cond
       [(is-zero? n) '(1)]
       [(multi n (factorial (predecessor n)))])))
 
-(test-equal? "" (factorial '(3)) '(6))
-(test-equal? "" (to-int (factorial '(8))) 40320)
-; (test-equal? "" (factorial '(10)) '(0 0 15 5 7 3)) ; TAKES A LONG TIME
+(check-equal? (factorial '(3)) '(6))
+(check-equal? (to-int (factorial '(8))) 40320)
+; (check-equal? (factorial '(10)) '(0 0 15 5 7 3)) ; TAKES A LONG TIME
 
 ;(time (to-int (factorial '(6))))
 ;(time (to-int (factorial '(7))))
@@ -135,7 +135,7 @@
       [(equal? (car t) 'diff) (equal? (car (cdr t)) (car (cdr (cdr t))))]
       [else #f])))
 
-(test-true "" (is-zerod? (diff (one) (one))))
+(check-true (is-zerod? (diff (one) (one))))
 
 ;(define firstD (lambda (t) (car (cdr t))))
 ;(define seconD (lambda (t) (car (cdr (cdr t)))))
@@ -158,10 +158,10 @@
       [(equal? t '(one)) 1]
       [(- (to-intd (firstD t)) (to-intd (seconD t)))])))
 
-(test-equal? "" (to-intd (diff (one) (one))) 0)
-(test-equal? "" (to-intd (diff (one) (diff (one) (one)))) 1)
-(test-equal? "" (to-intd (diff (diff (one) (one)) (diff (one) (zerod)))) -1)
-(test-equal? "" (to-intd (diff (diff (one) (diff (one) (one)))
+(check-equal? (to-intd (diff (one) (one))) 0)
+(check-equal? (to-intd (diff (one) (diff (one) (one)))) 1)
+(check-equal? (to-intd (diff (diff (one) (one)) (diff (one) (zerod)))) -1)
+(check-equal? (to-intd (diff (diff (one) (diff (one) (one)))
                                 (diff (diff (one) (one)) (diff (one) (zerod))))) 2)
 
 (define one+
@@ -176,23 +176,23 @@
       [(equal? t '(one)) (one+)]
       [(diff (successord (firstD t)) (seconD t))])))
 
-(test-equal? "" (to-intd (successord (zerod))) 1)
-(test-equal? "" (to-intd (successord (diff (one) (one)))) 1)
-(test-equal? "" (to-intd (successord (successord (diff (one) (one))))) 2)
-(test-equal? "" (to-intd (successord (successord (successord (diff (one) (one)))))) 3)
+(check-equal? (to-intd (successord (zerod))) 1)
+(check-equal? (to-intd (successord (diff (one) (one)))) 1)
+(check-equal? (to-intd (successord (successord (diff (one) (one))))) 2)
+(check-equal? (to-intd (successord (successord (successord (diff (one) (one)))))) 3)
 
 (define predecessord
   (lambda (t)
     (cond
       [(equal? t '(one)) (one+)]
       [(diff (firstD t) (predecessord (seconD t)))])))
-    
-(test-equal? "" (to-intd (predecessord (zerod))) -1)
-(test-equal? "" (to-intd (predecessord (diff (one) (one)))) -1)
-(test-equal? "" (to-intd (predecessord (predecessord (diff (one) (one))))) -2)
-(test-equal? "" (to-intd (predecessord (predecessord (predecessord (diff (one) (one)))))) -3)
 
-(test-equal? "" (to-intd (successord (successord (successord 
+(check-equal? (to-intd (predecessord (zerod))) -1)
+(check-equal? (to-intd (predecessord (diff (one) (one)))) -1)
+(check-equal? (to-intd (predecessord (predecessord (diff (one) (one))))) -2)
+(check-equal? (to-intd (predecessord (predecessord (predecessord (diff (one) (one)))))) -3)
+
+(check-equal? (to-intd (successord (successord (successord
                            (predecessord (predecessord (predecessord (zerod)))))))) 0)
 
 (define plusd_slow ; the same as plus => very slow because succ adds too much blabber
@@ -201,7 +201,7 @@
       [(is-zerod? b1) b2]
       [(plusd_slow (predecessord b1) (successord b2))])))
 
-(test-equal? "" (plusd_slow (zerod) (zerod)) (zerod))
+(check-equal? (plusd_slow (zerod) (zerod)) (zerod))
 
 (define diff-tree-plus ; needs refactor and more thought
   (lambda (b1 b2)
@@ -213,19 +213,19 @@
       [(diff (diff-tree-plus (firstD b1) (firstD b2))
              (diff-tree-plus (seconD b1) (seconD b2)))])))
 
-(test-equal? "" (to-intd (diff-tree-plus (zerod) (zerod))) 0)
-(test-equal? "" (to-intd (diff-tree-plus (one) (one))) 2)
-(test-equal? "" (to-intd (diff-tree-plus (one) 
+(check-equal? (to-intd (diff-tree-plus (zerod) (zerod))) 0)
+(check-equal? (to-intd (diff-tree-plus (one) (one))) 2)
+(check-equal? (to-intd (diff-tree-plus (one)
                                  (diff (diff (one) (diff (one) (one)))
                                        (diff (diff (one) (one)) (diff (one) (zerod)))))) 3)
-(test-equal? "" (to-intd (diff-tree-plus (diff (diff (one) (diff (one) (one)))
+(check-equal? (to-intd (diff-tree-plus (diff (diff (one) (diff (one) (one)))
                                        (diff (diff (one) (one)) (diff (one) (zerod))))
                                  (one))) 3)
-(test-equal? "" (to-intd (diff-tree-plus (zerod) (diff (one) (diff (one) (one))))) 1)
-(test-equal? "" (to-intd (diff-tree-plus (diff (one) (diff (one) (one))) (zerod))) 1)
-(test-equal? "" (to-intd (diff-tree-plus (diff (one) (diff (one) (one)))
+(check-equal? (to-intd (diff-tree-plus (zerod) (diff (one) (diff (one) (one))))) 1)
+(check-equal? (to-intd (diff-tree-plus (diff (one) (diff (one) (one))) (zerod))) 1)
+(check-equal? (to-intd (diff-tree-plus (diff (one) (diff (one) (one)))
                                  (diff (one) (diff (one) (one))))) 2)
-(test-equal? "" (to-intd (diff-tree-plus
+(check-equal? (to-intd (diff-tree-plus
                            (diff (diff (one) (diff (one) (one)))
                                  (diff (diff (one) (one)) (diff (one) (zerod))))                 ; 2
                            (predecessord (predecessord (predecessord (diff (one) (one))))))) -1) ; -3
@@ -263,8 +263,8 @@
         (extend-env 'y 14
           (empty-env))))))
 
-(test-equal? "" (apply-env e 'x) 7)
-(test-equal? "" (apply-env e 'y) 8)
+(check-equal? (apply-env e 'x) 7)
+(check-equal? (apply-env e 'y) 8)
 (check-exn exn:fail? (lambda () (apply-env e 'z)))
 
 ; I am not sure they are asking for this...
@@ -303,10 +303,10 @@
         (push 14
           (empty-stack))))))
 
-(test-false  "" (empty-stack? s))
-(test-equal? "" (top s) 6)
-(test-equal? "" (top (pull s)) 8)
-(test-true   "" (empty-stack? (pull (pull (pull (pull s))))))
+(check-false  (empty-stack? s))
+(check-equal? (top s) 6)
+(check-equal? (top (pull s)) 8)
+(check-true   (empty-stack? (pull (pull (pull (pull s))))))
 
 ; 2.5 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -336,7 +336,7 @@
         (extend-env-al 'y 14
           (empty-env-al))))))
 
-(test-equal? "" (apply-env-al eal 'y) 8)
+(check-equal? (apply-env-al eal 'y) 8)
 (check-exn exn:fail? (lambda () (apply-env-al eal 'z)))
 
 ; 2.6 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -362,8 +362,8 @@
         (extend-env-1 13
           (empty-env-1))))))
 
-(test-true  "" (apply-env-1 e1 2))
-(test-false "" (apply-env-1 e1 7))
+(check-true  (apply-env-1 e1 2))
+(check-false (apply-env-1 e1 7))
 
 ; Second Idea: List with recursive reference
 ;   todo: fail because of circularity not enforced !!
@@ -383,9 +383,9 @@
              vl))]
       [(fetch var (cdr env))])))
 
-(test-equal? "" (fetch 'a '((a 1) (x c) (c 3))) 1)
-(test-equal? "" (fetch 'x '((a 1) (x c) (c 3))) 3)
-(test-equal? "" (fetch 'b '((a 1) (x c) (c 3))) '())
+(check-equal? (fetch 'a '((a 1) (x c) (c 3))) 1)
+(check-equal? (fetch 'x '((a 1) (x c) (c 3))) 3)
+(check-equal? (fetch 'b '((a 1) (x c) (c 3))) '())
 
 (define extend-env-2
   (lambda (var val env)
@@ -402,16 +402,16 @@
 
 (define e2
   (extend-env-2 'd 10
-    (extend-env-2 'w 'y            
+    (extend-env-2 'w 'y
       (extend-env-2 'y 'x
         (extend-env-2 'x 'z
           (extend-env-2 'z 9
             (extend-env-2 'z 1
               (empty-env-2))))))))
 
-(test-equal? "" (apply-env-2 e2 'z) 1)
-(test-equal? "" (apply-env-2 e2 'x) 1)
-(test-equal? "" (apply-env-2 e2 'w) 1)
+(check-equal? (apply-env-2 e2 'z) 1)
+(check-equal? (apply-env-2 e2 'x) 1)
+(check-equal? (apply-env-2 e2 'w) 1)
 (check-exn exn:fail? (lambda () (apply-env-2 e2 'm)))
 
 ; Third Idea: Trees // Vectors // Lambda Calculus
@@ -425,7 +425,6 @@
 (define report-invalid-env-better
   (lambda (instr env)
     (eopl:error 'apply-env "WTF? Dunno what ~s is in the environment ~s" instr env)))
-    
 
 (define apply-env-better
   (lambda (env var)
@@ -467,7 +466,7 @@
       (extend-env-al* '(x y) '(8 9)
         (empty-env-al)))))
 
-(test-equal? "" e10 '((a 1) (b 2) (c 3) (m 5) (x 8) (y 9)))
+(check-equal? e10 '((a 1) (b 2) (c 3) (m 5) (x 8) (y 9)))
 
 ; 2.11 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -503,11 +502,11 @@
         (extend-env-alribs* '(y z) '(8 9)
           (empty-env-alribs))))))
 
-(test-equal? "" ealribs '((foo 6) ((a b c) (1 2 3)) (x 7) ((y z) (8 9))))
-(test-equal? "" (apply-env-alribs ealribs 'foo) 6)
-(test-equal? "" (apply-env-alribs ealribs 'z) 9)
-(test-equal? "" (apply-env-alribs ealribs 'x) 7)
-(test-equal? "" (apply-env-alribs ealribs 'z) 9)
+(check-equal? ealribs '((foo 6) ((a b c) (1 2 3)) (x 7) ((y z) (8 9))))
+(check-equal? (apply-env-alribs ealribs 'foo) 6)
+(check-equal? (apply-env-alribs ealribs 'z) 9)
+(check-equal? (apply-env-alribs ealribs 'x) 7)
+(check-equal? (apply-env-alribs ealribs 'z) 9)
 (check-exn exn:fail? (lambda () (apply-env-al eal 'w)))
 
 ; 2.12 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -534,9 +533,9 @@
       (extend-e 'c 3
         (empty-e)))))
 
-(test-equal? "" (E 'b) 2)
+(check-equal? (E 'b) 2)
 
-; Again not sure if this is correct ;;;;;;;;;;;;;;;;;;;;;;;;
+; Freaky implementation
 
 (define report-end-of-stK  (lambda () (eopl:error 'whathaveyou "Enf Of Stack")))
 
@@ -548,13 +547,15 @@
 (define pushK
   (lambda (saved-val saved-stk)
     (lambda ()
-      (pullK saved-val)
-      ;saved-stk               ; if i want to return stack to keep screwing with it!
-      )))
+      (list saved-val saved-stk))))
 
-(define pullK
-  (lambda (v)
-    v))
+(define topK
+  (lambda (stk)
+    (car (stk))))
+
+(define popK
+  (lambda (stk)
+    (car (cdr (stk)))))
 
 (define S
   (pushK 6
@@ -562,10 +563,12 @@
       (pushK 99
         (empty-stK)))))
 
-(define SE
-  (empty-stK))
+(define SE (empty-stK))
 
-(test-equal? "" (S) 6)
+(check-equal? (topK (popK S)) 8)
+(check-equal? (topK (popK (popK S))) 99)
+(check-equal? (topK (pushK 000 (popK (popK S)))) 0)
+(check-exn exn:fail? (lambda () (topK (popK (popK (popK S))))))
 (check-exn exn:fail? (lambda () (SE)))
 
 ; 2.13 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -593,8 +596,8 @@
       (extend-ext 'c 3
         (empty-ext)))))
 
-(test-equal? "" (EX0 'b) '(() #t))
-(test-equal? "" (EX  'b) '(2  #f))
+(check-equal? (EX0 'b) '(() #t))
+(check-equal? (EX  'b) '(2  #f))
 
 ; 2.14 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -602,10 +605,10 @@
   (lambda (search-var E)
     (not (cadr (E search-var)))))
 
-(test-false "" (has-binding-ext? 'a EX0))
-(test-true  "" (has-binding-ext? 'b EX))
-(test-true  "" (has-binding-ext? 'c EX))
-(test-false "" (has-binding-ext? 'x EX))
+(check-false (has-binding-ext? 'a EX0))
+(check-true  (has-binding-ext? 'b EX))
+(check-true  (has-binding-ext? 'c EX))
+(check-false (has-binding-ext? 'x EX))
 
 ; 2.15 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -616,7 +619,7 @@
       [(eqv? (car E) 'lambda)
        (and (not (eqv? (caadr E) V))
             (occurs-free-v0? V (caddr E)))]
-      [else (or 
+      [else (or
              (occurs-free-v0? V (car E))
              (occurs-free-v0? V (cadr E)))])))
 
@@ -705,21 +708,21 @@
 (define at-left-end?  (λ(NIS) (null? (preceding NIS))))
 (define at-right-end? (λ(NIS) (null? (following NIS))))
 
-(test-equal? "" (move-to-left '(6 (5 4 3 2 1) (7 8 9))) '(5 (4 3 2 1) (6 7 8 9)))
-(test-equal? "" (move-to-left '(6 (5) ())) '(5 () (6)))
+(check-equal? (move-to-left '(6 (5 4 3 2 1) (7 8 9))) '(5 (4 3 2 1) (6 7 8 9)))
+(check-equal? (move-to-left '(6 (5) ())) '(5 () (6)))
 (check-exn exn:fail? (lambda () (move-to-left '(6 () (7 8 9)))))
 
-(test-equal? "" (move-to-right '(6 (5 4 3 2 1) (7 8 9))) '(7 (6 5 4 3 2 1) (8 9)))
-(test-equal? "" (move-to-right '(6 () (7))) '(7 (6) ()))
+(check-equal? (move-to-right '(6 (5 4 3 2 1) (7 8 9))) '(7 (6 5 4 3 2 1) (8 9)))
+(check-equal? (move-to-right '(6 () (7))) '(7 (6) ()))
 (check-exn exn:fail? (lambda () (move-to-right '(6 () ()))))
 
-(test-equal? "" (insert-to-left 13 '(6 (5 4 3 2 1) (7 8 9))) '(6 (13 5 4 3 2 1) (7 8 9)))
-(test-equal? "" (insert-to-right 13 '(6 (5 4 3 2 1) (7 8 9))) '(6 (5 4 3 2 1) (13 7 8 9)))
+(check-equal? (insert-to-left 13 '(6 (5 4 3 2 1) (7 8 9))) '(6 (13 5 4 3 2 1) (7 8 9)))
+(check-equal? (insert-to-right 13 '(6 (5 4 3 2 1) (7 8 9))) '(6 (5 4 3 2 1) (13 7 8 9)))
 
-(test-true  "" (at-left-end?  '(6 () (7 8 9))))
-(test-true  "" (at-right-end? '(6 (5 4 3 2 1) ())))
-(test-false "" (at-left-end?  '(6 (5) (7 8 9))))
-(test-false "" (at-right-end? '(6 (5 4 3 2 1) (7))))
+(check-true  (at-left-end?  '(6 () (7 8 9))))
+(check-true  (at-right-end? '(6 (5 4 3 2 1) ())))
+(check-false (at-left-end?  '(6 (5) (7 8 9))))
+(check-false (at-right-end? '(6 (5 4 3 2 1) (7))))
 
 ; 2.19 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Bintree ::= () | (Int Bintree Bintree)
@@ -746,11 +749,11 @@
                 (list n '() (right-branch t)))))  ; i assume we push the tree below to the right
 
 (define t1 (insert-to-right-branch 14 (insert-to-left-branch 12 (number->bintree 13))))
-(test-equal? "" (number->bintree 13) '(13 () ()))
-(test-equal? "" t1 '(13 (12 () ()) (14 () ())))
-(test-equal? "" (move-to-left-son t1) '(12 () ()))
-(test-true   "" (at-leaf? (move-to-right-son (move-to-left-son t1))))
-(test-equal? "" (insert-to-left-branch 15 t1) '(13 (15 (12 () ()) ()) (14 () ())))
+(check-equal? (number->bintree 13) '(13 () ()))
+(check-equal? t1 '(13 (12 () ()) (14 () ())))
+(check-equal? (move-to-left-son t1) '(12 () ()))
+(check-true   (at-leaf? (move-to-right-son (move-to-left-son t1))))
+(check-equal? (insert-to-left-branch 15 t1) '(13 (15 (12 () ()) ()) (14 () ())))
 
 ; 2.20 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Bintree  ::= () | (Int (Bintree Bintree))
@@ -763,7 +766,7 @@
 
 (define st-tree (lambda (st) (car st)))
 (define st-memo (lambda (st) (car (cdr st))))
-    
+
 (define n->sototree (lambda (n) (list (number->bintree n) (memo->empty))))
 (define st-node (lambda (st) (current-node (st-tree st))))
 
@@ -772,7 +775,7 @@
     (let ([T (st-tree st)] [M (st-memo st)])
       (list (move-to-left-son T)
             (memo->push (list (current-node T) #f (right-branch T)) M)))))
-  
+
 (define soto->go-right
   (lambda (st)
     (let ([T (st-tree st)] [M (st-memo st)])
@@ -794,22 +797,22 @@
        (cons (current-node dad)
              (if (left-branch dad) (list (left-branch dad) T) (list T (right-branch dad))))
        (memo->pull (st-memo st))))))
-  
+
 (define @leaf? (λ(st) (at-leaf? (st-tree st))))
 (define @root? (λ(st) (null? (st-memo st))))
 
 (define t3 (soto->add-right 14 (soto->add-left 12 (n->sototree 13))))
-(test-equal? "" t3 (list t1 (memo->empty)))
-(test-equal? "" (soto->go-left t3) '((12 () ()) ((13 #f (14 () ())))))
-(test-equal? "" (soto->go-up (soto->go-left t3)) t3)
-(test-true   "" (@root? (soto->go-up (soto->go-right (soto->go-up (soto->go-left t3))))))
+(check-equal? t3 (list t1 (memo->empty)))
+(check-equal? (soto->go-left t3) '((12 () ()) ((13 #f (14 () ())))))
+(check-equal? (soto->go-up (soto->go-left t3)) t3)
+(check-true   (@root? (soto->go-up (soto->go-right (soto->go-up (soto->go-left t3))))))
 
 ; 2.21 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Env = (empty-env) | (extend-env Var SchemeVal Env)
 ; Var = Sym
 
 (define-datatype Env Env?
-   (empty-env-dt)
+   (empty-env-dt)        ; where do I place the predicate empty-env-dt?
    (extend-env-dt
     (saved-var symbol?)
     (saved-val number?)
@@ -831,7 +834,7 @@
 (define has-binding-dt?
   (lambda (E V)
     (number? (apply-env-dt E V))))
-    
+
 (define edt
   (extend-env-dt 'd 6
     (extend-env-dt 'y 8
@@ -839,14 +842,14 @@
         (extend-env-dt 'y 14
           (empty-env-dt))))))
 
-(test-true   "" (empty-env-dt? (empty-env-dt)))
-(test-false  "" (empty-env-dt? edt))
-(test-equal? "" (apply-env-dt edt 'x) 7)
-(test-equal? "" (apply-env-dt edt 'y) 8)
-(test-false  "" (apply-env-dt edt 'z))
-(test-false  "" (has-binding-dt? edt 'z))
-(test-true   "" (has-binding-dt? edt 'x))
-(test-false  "" (has-binding-dt? (empty-env-dt) 'x))
+(check-true   (empty-env-dt? (empty-env-dt)))
+(check-false  (empty-env-dt? edt))
+(check-equal? (apply-env-dt edt 'x) 7)
+(check-equal? (apply-env-dt edt 'y) 8)
+(check-false  (apply-env-dt edt 'z))
+(check-false  (has-binding-dt? edt 'z))
+(check-true   (has-binding-dt? edt 'x))
+(check-false  (has-binding-dt? (empty-env-dt) 'x))
 
 ; 2.22 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -881,16 +884,16 @@
         (push-dt 14
           (empty-stack-dt))))))
 
-(test-false  "" (empty-stack-dt? sdt))
-(test-equal? "" (top-dt sdt) 6)
-(test-equal? "" (top-dt (pull-dt sdt)) 8)
-(test-true   "" (empty-stack-dt? (pull-dt (pull-dt (pull-dt (pull-dt sdt))))))
-(test-false  "" (empty-stack-dt? (pull-dt (pull-dt (pull-dt sdt)))))
+(check-false  (empty-stack-dt? sdt))
+(check-equal? (top-dt sdt) 6)
+(check-equal? (top-dt (pull-dt sdt)) 8)
+(check-true   (empty-stack-dt? (pull-dt (pull-dt (pull-dt (pull-dt sdt))))))
+(check-false  (empty-stack-dt? (pull-dt (pull-dt (pull-dt sdt)))))
 
 ; 2.23 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (define valid-var-23?
-  (lambda (x) 
+  (lambda (x)
     (not (and (symbol? x)
               (list? x)
               (vector? x)
@@ -898,7 +901,7 @@
               (boolean? x)
               (or (equal? x 'lambda) (equal? x 'λ))))))
 
-(define-datatype lc-exp-23 lc-exp-23? 
+(define-datatype lc-exp-23 lc-exp-23?
   (var-exp-23
    (var valid-var-23?))
   (lambda-exp-23
@@ -910,7 +913,7 @@
    (rand lc-exp-23?)))
 
 (define lambda? (λ(x) (equal? x 'lambda)))                  ; diff
-  
+
 (define occurs-freak?
   (lambda (search-var exp)
     (cases lc-exp-23 exp
@@ -938,7 +941,7 @@
       (leaf-node (n) (list 'leaf-node n))
       (interior-node (k l r) (list k (bintree-to-list l) (bintree-to-list r))))))
 
-(test-equal? "" (bintree-to-list (interior-node 'a (leaf-node 3) (leaf-node 4)))
+(check-equal? (bintree-to-list (interior-node 'a (leaf-node 3) (leaf-node 4)))
                 '(a (leaf-node 3) (leaf-node 4)))
 
 ; 2.25 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -970,17 +973,17 @@
                                        (set! max-val MX))
                                      (+ ML MR)))))))
         (traverse T)
-        (list max-key max-val)))))           
+        (list max-key max-val)))))
 
-(test-equal? "" (max-interior tree-2) '(foo 5))
-(test-equal? "" (max-interior tree-3) '(baz 5))
+(check-equal? (max-interior tree-2) '(foo 5))
+(check-equal? (max-interior tree-3) '(baz 5))
 
 ; 2.26 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Red-blue-tree    ::= Red-blue-subtree
 ; Red-blue-subtree ::= (red-node Red-blue-subtree Red-blue-subtree)
 ;                  ::= (blue-node {Red-blue-subtree}∗)
 ;                  ::= (leaf-node Int)
-  
+
 (define-datatype tree-rb tree-rb?
   (leafy-node
    (num integer?))
@@ -1000,7 +1003,7 @@
                 (leafy-node (m) (leafy-node n))
                 (blue-node-single (head) (blue-node-single (M head n)))
                 (blue-node-multi (head tail) (blue-node-multi (M head n) (M tail n)))
-                (red-node (t1 t2) 
+                (red-node (t1 t2)
                           (red-node (M t1 (+ n 1)) (M t2 (+ n 1))))))])
       (M tree 0))))
 
@@ -1015,7 +1018,7 @@
      (leafy-node 117)
      (leafy-node 14)))))
 
-(test-equal? "" (mark-red-depth pepe)
+(check-equal? (mark-red-depth pepe)
                 (red-node
                  (blue-node-multi
                   (leafy-node 1)
@@ -1084,7 +1087,7 @@
 ; 2.28 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (define valid-var?
-  (lambda (x) 
+  (lambda (x)
     (not (and (symbol? x) (list? x) (vector? x) (number? x) (boolean? x))))) ; brutal, I know
 
 (define-datatype lc-exp lc-exp?
@@ -1118,14 +1121,14 @@
             (parse! (car datum))
             (parse! (cadr datum)))))
       (else #f))))
-    
+
 (define fifi
    (App-exp
     (Lambda-exp 'a (App-exp (Var-exp 'a) (Var-exp 'b)))
     (Var-exp 'c)))
 
-(test-equal? "" (parse! '((lambda (a) (a b)) c)) fifi)
-(test-equal? "" (unparse! (parse! '((lambda (a) (a b)) c))) "((lambda (a) ((a b)) c)")
+(check-equal? (parse! '((lambda (a) (a b)) c)) fifi)
+(check-equal? (unparse! (parse! '((lambda (a) (a b)) c))) "((lambda (a) ((a b)) c)")
 
 ; 2.29 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -1162,10 +1165,10 @@
            (λfun (car (cadr datum)) (λparse! (caddr datum)))
            (λapp (λparse! (car datum)) (λparse! (cadr datum)))))
       (else #f))))
-    
+
 (define chuchi (λapp (λfun 'a (λapp (λvar 'a) (λvar 'b))) (λvar 'c)))
-(test-equal? "" (λparse! '((lambda (a) (a b)) c)) chuchi)
-(test-equal? "" (λunparse! (λparse! '((lambda (a) (a b)) c))) "((lambda (a) ((a b)) c)")
+(check-equal? (λparse! '((lambda (a) (a b)) c)) chuchi)
+(check-equal? (λunparse! (λparse! '((lambda (a) (a b)) c))) "((lambda (a) ((a b)) c)")
 
 ; 2.30 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; sorry, I do not give a shit about this exercise
@@ -1176,8 +1179,9 @@
 ;             ::= Prefix-exp Prefix-exp
 
 (define-datatype prefix-list prefix-list?
-  (prefix-thing
-   (prefix-exp prefix-exp?)))
+  (list-of-prefixes
+   (head-prefix prefix-exp?)
+   (rest-prefix prefix-list?)))
 
 (define-datatype prefix-exp prefix-exp?
   (const-exp
@@ -1197,12 +1201,21 @@
      (const-exp 12)
      (const-exp 7)))))
 
-(define prex-parse
-  (lambda (l) l
-    ))
+;(define prex-parse
+;  (lambda (l) l
+;    (cond
+;      [(null? l) l]
+;      [(number? l) (const-exp l)]
+;      [(list? l)
+;       (cond
+;         [(number? (car l)) (prex-parse (car l))]
+;         [(eqv? '- (car l))
+;         ...
+;    ))
 
-;(prex-parse '(2))
-;(prex-parse '(- 3 2))
+;(check-equal? (prex-parse '(2)) (const-exp 2))
+;(check-equal? (prex-parse '(- 3 2)) (diff-exp (const-exp 3) (const-exp 2)))
+;(prex-parse '(- 3 - 2 4))
 ;(prex-parse '(- - 3 2 4))
 ;(prex-parse '(- - 3 2 - 4 - 12 7))
 ;conchita
