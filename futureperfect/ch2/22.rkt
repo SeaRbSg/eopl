@@ -9,7 +9,7 @@ Exercise 2.22 Using define-datatype, implement the stack data type of exercise 2
 (define-datatype stack stack?
   (empty-stack)
   (push
-   (val (or number? symbol?))
+   (val (λ (x) (or (number? x) (symbol? x))))
    (stk stack?)))
 
 (define empty-stack?
