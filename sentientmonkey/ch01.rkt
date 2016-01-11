@@ -244,3 +244,60 @@
 
 (check-equal? (product '(a b c) '(x y))
               '((a x) (a y) (b x) (b y) (c x) (c y)))
+
+;; Exercise 1.22
+; filter-in: Sym x S-list -> S-List
+; usage: (filter-in pred lst), returns the list of those elements in the lst that satisfy the predicate pred.
+(define (filter-in pred lst)
+  (if (null? lst)
+    '()
+    (let ([elem (car lst)])
+      (if (pred elem)
+        (cons elem (filter-in pred (cdr lst)))
+        (filter-in pred (cdr lst))))))
+
+(check-equal? (filter-in number? '(a 2 (1 3) b 7))
+              '(2 7))
+
+(check-equal? (filter-in symbol? '(a (b c) 17 foo))
+              '(a foo))
+
+;; Exercise 1.23
+; list-index: Sym x S-list -> Int | Bool
+; usage: (list-index pred lst), returns the 0-based position of the first element of lst that satisfies the predicate pred. If no element of lst satisfies the predicate, then list-index returns #f.
+(define (list-index pred lst)
+  (letrec ([list-index-helper
+            (lambda (index lst)
+              (cond
+                [(null? lst) #f]
+                [(pred (car lst)) index]
+                [else
+                  (list-index-helper (+ index 1) (cdr lst))]))])
+    (list-index-helper 0 lst)))
+
+(check-equal? (list-index number? '(a 2 (1 3) b 7))
+              1)
+
+(check-equal? (list-index symbol? '(a (b c) 17 foo))
+              0)
+
+(check-false (list-index symbol? '(1 2 (a b) 3)))
+
+;; Exercise 1.24
+; exists?: Sym x S-list -> Bool
+; usage: (exists? pred lst) returns #t if any element of lst satisfies pred, and returns #f otherwise
+(define (every? pred lst)
+  (cond
+    [(null? lst) #t]
+    [(not (pred (car lst))) #f]
+    [else (every? pred (cdr lst))]))
+
+(check-false (every? number? '(a b c 3 e)))
+(check-true (every? number? '(1 2 3 4 5)))
+
+;; assume empty to be true, but this could be an error if we wanted.
+(check-true (every? number? '()))
+
+;; Exercise 1.27
+; flatten: S-list -> S-list
+; usage: (flatten slist)
